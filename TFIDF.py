@@ -15,16 +15,16 @@ from pyspark.mllib.linalg.distributed import IndexedRow, IndexedRowMatrix
 from pyspark.sql.functions import udf
 
 
-class Train():
+class Train:
 
-    def load_data_make_df(train_data, test_data):
+    def load_data_make_df(self, train_data, test_data):
         train_data = load(train_data)['arr_0'][:10000]
         test_data = load(test_data)['arr_0'][:10000]
         train_df = pd.DataFrame(train_data)
         test_df = pd.DataFrame(test_data)
         return train_df, test_df
     
-    def make_spark_df(train_df, test_df):
+    def make_spark_df(self, train_df, test_df):
 
         mySchema = StructType([ StructField("user", IntegerType(), True),StructField("film", IntegerType(), True)])
 
@@ -38,7 +38,7 @@ class Train():
 
         return  train, test
         
-    def tf_idf(train):
+    def tf_idf(self, train):
         
         hashingTF = HashingTF(inputCol="collect_list(user)", outputCol="tf",numFeatures=10000, )
         tf = hashingTF.transform(films_by_users)
@@ -76,7 +76,8 @@ if __name__ == "__main__":
     sc = SparkContext(conf=conf)
     spark = SparkSession(sc)
     
-    train, test = Train.load_data_make_df('trainx16x32_0.npz','testx16x32_0.npz')
-    train_df = Train.make_spark_df(train, test)
-    tfidf = Train.tf_idf(train_df)
+    train = Train()
+    train, test = train.load_data_make_df('trainx16x32_0.npz','testx16x32_0.npz')
+    train_df = train.make_spark_df(train, test)
+    tfidf = train.tf_idf(train_df)
     
